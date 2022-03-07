@@ -19,7 +19,7 @@
 
 /* Entendendo um BLOCO ANÔNIMO 
  - Contém a sessão DECLARE, opcionalmente utilizada, para declaração de variáveis, tipos de dados, cursores.
- - Sessão BEGIN - END, onde as operações de bancos de dados são utilizadas de fato
+ - Sessão BEGIN - END, onde as operações de bancos de dados são realizadas de fato
  - Opcionalmente e altamente recomendável, a sessão EXCEPTION, utilizada DENTRO DA SESSÃO BEGIN, ao final e antes do END, para tratamento de erros
 */
 DECLARE

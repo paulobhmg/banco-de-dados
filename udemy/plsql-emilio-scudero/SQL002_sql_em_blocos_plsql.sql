@@ -191,9 +191,35 @@ END prcRecuperaValorAnteriorDaSequencia;
 					ROLLBACK TO insertPoint;
 					COMMIT;
 		END; 
-	END;
-*/
+	END;*/
 
+-- Transação simples.
+DECLARE
+	vEmployeeId employees.employee_id%TYPE := 208;
+BEGIN
+	UPDATE employees
+	   SET salary = 33000
+	 WHERE employee_id = vEmployeeId;
+	 COMMIT;
+END;
+
+-- Transação básica com SAVEPOINT
+BEGIN
+	INSERT INTO employees (employee_id, first_name, last_name, email, hire_date, job_id, salary)
+	VALUES (employees_seq.NEXTVAL, 'Renato', 'Nogueira', 'nato@gmail.com', '01/03/2016', 'IT_PROG', 3000);
+	SAVEPOINT insertOk;
+	
+	UPDATE employees
+		 SET salary = 12000
+	 WHERE employee_id = 209;
+  ROLLBACK TO insertOk;
+	COMMIT;
+END;
+
+/* Transação complexa 
+ Neste exemplo, é necessário atentar-se que, ao utilizar o ROLLBACK TO SAVEPOINT, os valores armazenados
+ nas variáveis não são restaurados ao estado anterior, apenas os dados alterados no banco de dados.
+ Os valores das variáveis deverão ser retornados ao estado anterior utilizando a lógica desenvolvida no programa. */
 DECLARE
 	vSalarioAtual employees.salary%TYPE;
 	vNovoSalario  employees.salary%TYPE := &newSalary;
@@ -202,7 +228,6 @@ BEGIN
 	UPDATE employees
 		 SET salary = vNovoSalario
 	 WHERE employee_id = 208;
-	SAVEPOINT primeiroUpdate;
 	dbms_output.PUT_LINE('Primeiro salário informado: ' || vNovoSalario);
 	
 	IF(vNovoSalario < vSalarioAtual) THEN
@@ -210,6 +235,7 @@ BEGIN
 	ELSE
 		vSalarioAtual := vNovoSalario;
 	END IF;
+	SAVEPOINT primeiroUpdate;
 	
 	vNovoSalario := &newSalary;
   UPDATE employees
@@ -229,4 +255,24 @@ BEGIN
 	ElSE COMMIT;
 	END IF;
 END;
+
+/* CURSOR IMPLÍCITO é aberto sempre que é executado um comando SQL.
+ - Esse cursor é aberto administrado e fechado automaticamente pelo ORACLE.
+ - Após cada comando, é possível utilizar um atributo de cursor para verificar se houve ou não alteração nos dados.
+ - Os atributos de cursor devem ser utilizados imediatamente após o comando ser executado, pois ao executar qualquer outro comando, o valor será sobrescrito.
+ - O nome do cursor é SQL e os atributos possíveis são: SQL%ROWCOUNT, SQL%FOUND, SQL%NOTFOUND. */
  
+ /* OPERADORES PLSQL
+ - Existe uma regra de precedência quanto à utilização dos operadores utilizados no PLSQL, principalmente quando utilizados em operações complexas.
+ - As operações são lidas, linha a linha, da esquerda para a direita.
+ 1°: Exponênciações
+ 2°: Sinais positivo e negativo para os números
+ 3°: Operadores de multiplicação e divisão - na mesma procedência
+ 4°: Operadores de adição, subtração e concatenação - na mesma precedência
+ 5°: Operadores de comparação = < > <= >= <> != BETWEEN IN IS NULL LIKE 
+ 6°: Operador lógico AND
+ 7°: Operador lógico NOT
+ 8°: Operador lógido OR 
+
+ Para forçar ou sobrepor uma regra de precedência, utiliza-se parênteses. 
+ Caso os parênteses estejam alinhados, serão resolvidos de dentro pra fora. */
